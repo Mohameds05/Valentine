@@ -9,6 +9,7 @@
     <style>
         :root {
             --primary: #d63031;
+            --accent: #fdcb6e;
             --bg: #fff5f5;
         }
 
@@ -18,74 +19,125 @@
             background-color: var(--bg);
         }
 
-        /* --- THE ULTIMATE BACK BUTTON --- */
-        .global-back {
+        /* --- BACK BUTTONS --- */
+        .nav-back {
             position: fixed; top: 20px; left: 20px;
-            background: white; border: none; padding: 12px 20px; 
-            border-radius: 30px; font-weight: 600; color: var(--primary); 
-            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-            z-index: 10005; /* Higher than everything else */
-            display: none; 
-            align-items: center; gap: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none; padding: 10px 18px; border-radius: 30px;
+            font-weight: 600; color: var(--primary); cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 4000;
+            display: flex; align-items: center; gap: 5px;
+            transition: 0.3s;
         }
 
-        /* --- ENVELOPE LAYER --- */
+        /* --- ROMANTIC ENVELOPE (THE DOOR) --- */
         #envelope-wrapper {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
             background: radial-gradient(circle, #ffafbd, #ffc3a0);
-            z-index: 5000; transition: transform 0.8s ease-in-out;
+            z-index: 1000; transition: transform 1s ease-in-out;
         }
+
         .envelope {
             position: relative; width: 280px; height: 180px;
-            background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            background: #fff; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
         .envelope:before {
             content: ""; position: absolute; top: 0; z-index: 2;
             border-left: 140px solid transparent; border-right: 140px solid transparent;
-            border-top: 100px solid #f8f9fa; transition: 0.5s; transform-origin: top;
+            border-top: 100px solid #f8f9fa; transform-origin: top; transition: all 0.5s 0.3s ease;
         }
-        .envelope.open:before { transform: rotateX(180deg); }
-        .envelope-opened { transform: translateY(-100vh); pointer-events: none; }
+        .heart-seal {
+            position: absolute; z-index: 3; font-size: 2.5rem;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
-        /* --- MAIN PAGE --- */
+        .envelope.open:before { transform: rotateX(180deg); z-index: 0; }
+        .envelope-opened { transform: translateY(-100vh); opacity: 0; pointer-events: none; }
+
+        /* --- MAIN CONTENT --- */
         .main-container {
             height: 100vh; display: flex; align-items: center; justify-content: center;
-            flex-direction: column; text-align: center;
+            flex-direction: column; text-align: center; padding: 20px;
         }
+
         .card {
-            background: white; padding: 40px; border-radius: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1); width: 85%; max-width: 380px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px; border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(214, 48, 49, 0.15);
+            max-width: 400px; width: 90%; border: 1px solid rgba(255,255,255,0.8);
+            position: relative; z-index: 10;
+        }
+
+        h1 { font-family: 'Great Vibes', cursive; font-size: 3.5rem; color: var(--primary); margin: 0; }
+        p { color: #636e72; margin: 15px 0 30px; font-weight: 500; }
+
+        /* --- BUTTONS --- */
+        .btn-container { position: relative; height: 120px; width: 100%; margin-top: 20px; }
+        
+        button {
+            border: none; padding: 15px 35px; border-radius: 50px;
+            font-size: 1.1rem; font-weight: 600; cursor: pointer;
+            font-family: 'Poppins', sans-serif; transition: 0.2s;
         }
 
         #yes-btn {
-            background: #2ed573; color: white; padding: 15px 30px; border-radius: 50px;
+            background: #2ed573; color: white;
             position: absolute; left: 50%; transform: translateX(-110%);
-            border: none; cursor: pointer; font-weight: bold;
+            z-index: 100; white-space: nowrap;
         }
+
         #no-btn {
-            background: var(--primary); color: white; padding: 15px 30px; border-radius: 50px;
+            background: var(--primary); color: white;
             position: absolute; left: 50%; transform: translateX(10%);
-            border: none; cursor: pointer; font-weight: bold;
         }
+
+        /* --- POPUP --- */
+        #popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 2000;
+        }
+        .popup-box {
+            background: white; padding: 30px; border-radius: 30px; width: 85%; max-width: 320px;
+            text-align: center; animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popUp { from { transform: scale(0); } to { transform: scale(1); } }
 
         /* --- SUCCESS SCREEN --- */
         #success-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; display: none;
-            flex-direction: column; align-items: center; justify-content: center; z-index: 8000;
+            background: white; display: none; flex-direction: column;
+            align-items: center; justify-content: center; 
+            z-index: 5000; /* FIXED: Increased Z-Index to be higher than nav-back (4000) */
         }
 
+        /* --- EFFECTS (PETALS & SPARKLES) --- */
         .petal {
-            position: absolute; background: #ff4d4d; border-radius: 150% 0 150% 0;
-            animation: fall linear infinite; pointer-events: none;
+            position: absolute; top: -10%; 
+            background: #ff4d4d; border-radius: 150% 0 150% 0;
+            opacity: 0.7; animation: fall linear infinite; z-index: 5;
         }
-        @keyframes fall { to { transform: translateY(110vh) rotate(540deg); } }
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(540deg); }
+        }
 
+        .sparkle {
+            position: absolute; background: white; border-radius: 50%;
+            box-shadow: 0 0 10px 2px gold; animation: blink 1.5s infinite alternate;
+            z-index: 6;
+        }
+        @keyframes blink { from { opacity: 0.2; transform: scale(0.5); } to { opacity: 1; transform: scale(1.2); } }
+
+        /* Music Toggle */
         .music-btn {
             position: fixed; top: 20px; right: 20px; background: white;
             width: 45px; height: 45px; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; z-index: 10001; cursor: pointer;
+            align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 1001;
         }
     </style>
 </head>
@@ -94,41 +146,44 @@
     <audio id="bg-music" loop>
         <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-111566.mp3" type="audio/mp3">
     </audio>
-    <div class="music-btn" onclick="toggleMusic()">🎵</div>
 
-    <button class="global-back" id="master-back" onclick="handleBack()">← Back</button>
+    <div class="music-btn" onclick="toggleMusic()">🎵</div>
 
     <div id="envelope-wrapper" onclick="openEnvelope()">
         <div class="envelope" id="envelope">
-            <div style="font-size: 2.5rem; z-index: 3;">❤️</div>
+            <div class="heart-seal">❤️</div>
             <div style="font-family: 'Great Vibes'; font-size: 1.5rem; margin-top: 50px;">Pour Toi...</div>
         </div>
     </div>
 
     <div class="main-container">
+        <button class="nav-back" onclick="goBackToEnvelope()">← Back</button>
         <div class="card">
-            <h1 style="font-family: 'Great Vibes'; font-size: 3rem; color: var(--primary);">Will you be my Valentine?</h1>
+            <div style="font-size: 4rem; margin-bottom: 10px;">🌹</div>
+            <h1>Will you be my Valentine?</h1>
             <p>I have a special place in my heart for you... ❤️</p>
-            <div style="position: relative; height: 100px; margin-top: 20px;">
-                <button id="yes-btn" onmouseover="runAway()" onclick="finalCelebrate()" ontouchstart="runAway()">YES! 😍</button>
+            
+            <div class="btn-container">
+                <button id="yes-btn" onmouseover="runAway()" onclick="runAway()" ontouchstart="runAway()">YES! 😍</button>
                 <button id="no-btn" onclick="showTrap()">No 😒</button>
             </div>
         </div>
     </div>
 
-    <div id="success-screen">
-        <div id="petal-container" style="position: absolute; width:100%; height:100%; pointer-events:none;"></div>
-        <h1 style="font-size: 3.5rem; font-family: 'Great Vibes'; color: var(--primary);">I knew it! ❤️</h1>
-        <p style="font-size: 1.2rem;">You are mine forever.</p>
-        <div style="font-size: 5rem;">💍✨</div>
+    <div id="popup-overlay">
+        <div class="popup-box">
+            <h2 style="font-family: 'Great Vibes'; font-size: 2.5rem; color: var(--primary); margin: 0;">Chnouwa?? 🤨</h2>
+            <p style="font-weight: 600;">Mayhmnich f rayek you will be my Valentine 😤❤️</p>
+            <button style="background: var(--primary); color: white; width: 100%; border-radius: 20px;" onclick="finalCelebrate()">Yes🥰</button>
+        </div>
     </div>
 
-    <div id="popup-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9000; align-items:center; justify-content:center;">
-        <div style="background:white; padding:30px; border-radius:30px; text-align:center; width: 80%;">
-            <h2>Chnouwa?? 🤨</h2>
-            <p>Mayhmnich f rayek you will be my Valentine 😤❤️</p>
-            <button style="background:var(--primary); color:white; border:none; padding:12px 25px; border-radius:20px; font-weight:bold; cursor:pointer;" onclick="finalCelebrate()">Yes 🥰</button>
-        </div>
+    <div id="success-screen">
+        <div id="effects-container" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
+        <button class="nav-back" onclick="goBackToQuestion()">← Back</button>
+        <h1 style="font-size: 4rem; z-index: 10;">I knew it! ❤️</h1>
+        <p style="font-size: 1.5rem; z-index: 10;">You are mine forever.</p>
+        <div style="font-size: 5rem; animation: pulse 1s infinite; z-index: 10;">💍✨</div>
     </div>
 
     <script>
@@ -136,7 +191,7 @@
         let playing = false;
 
         function toggleMusic() {
-            if(playing) music.pause(); else music.play();
+            if(playing) { music.pause(); } else { music.play(); }
             playing = !playing;
         }
 
@@ -145,35 +200,24 @@
             if(!playing) toggleMusic();
             setTimeout(() => {
                 document.getElementById('envelope-wrapper').classList.add('envelope-opened');
-                document.getElementById('master-back').style.display = 'flex';
-            }, 600);
+            }, 800);
         }
 
-        // --- FIXED BACK LOGIC ---
-        function handleBack() {
-            const success = document.getElementById('success-screen');
-            const trap = document.getElementById('popup-overlay');
-            const envelopeWrapper = document.getElementById('envelope-wrapper');
-
-            // If Success screen is visible, hide it
-            if (window.getComputedStyle(success).display !== 'none') {
-                success.style.display = 'none';
-                document.getElementById('petal-container').innerHTML = '';
-            } 
-            // If Trap popup is visible, hide it
-            else if (window.getComputedStyle(trap).display !== 'none') {
-                trap.style.display = 'none';
-            } 
-            // Otherwise, go all the way back to the envelope
-            else {
-                envelopeWrapper.classList.remove('envelope-opened');
-                document.getElementById('envelope').classList.remove('open');
-                document.getElementById('master-back').style.display = 'none';
-            }
-            resetYes();
+        function goBackToEnvelope() {
+            const wrapper = document.getElementById('envelope-wrapper');
+            const envelope = document.getElementById('envelope');
+            wrapper.classList.remove('envelope-opened');
+            envelope.classList.remove('open');
+            resetYesButton();
         }
 
-        function resetYes() {
+        function goBackToQuestion() {
+            document.getElementById('success-screen').style.display = 'none';
+            document.getElementById('effects-container').innerHTML = ''; // Clear petals
+            resetYesButton();
+        }
+
+        function resetYesButton() {
             const btn = document.getElementById('yes-btn');
             btn.style.position = 'absolute';
             btn.style.left = '50%';
@@ -183,30 +227,50 @@
 
         function runAway() {
             const btn = document.getElementById('yes-btn');
+            const x = Math.random() * (window.innerWidth - btn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - btn.offsetHeight);
             btn.style.position = 'fixed';
-            btn.style.left = Math.random() * (window.innerWidth - 120) + 'px';
-            btn.style.top = Math.random() * (window.innerHeight - 60) + 'px';
-            btn.style.transform = 'none';
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+            btn.style.transform = 'none'; 
         }
 
-        function showTrap() { 
-            document.getElementById('popup-overlay').style.display = 'flex'; 
+        function showTrap() {
+            document.getElementById('popup-overlay').style.display = 'flex';
         }
 
         function finalCelebrate() {
             document.getElementById('popup-overlay').style.display = 'none';
             document.getElementById('success-screen').style.display = 'flex';
-            const container = document.getElementById('petal-container');
-            container.innerHTML = ''; // Clear old petals
-            for(let i=0; i<30; i++) {
-                let p = document.createElement('div');
-                p.className = 'petal';
-                p.style.left = Math.random() * 100 + 'vw';
-                p.style.width = Math.random() * 15 + 10 + 'px';
-                p.style.height = p.style.width;
-                p.style.animationDuration = Math.random() * 3 + 2 + 's';
-                p.style.animationDelay = Math.random() * 2 + 's';
-                container.appendChild(p);
+            startRomanticEffects();
+        }
+
+        // --- ROSE PETALS & SPARKLES LOGIC ---
+        function startRomanticEffects() {
+            const container = document.getElementById('effects-container');
+            
+            // Create Petals
+            for (let i = 0; i < 30; i++) {
+                let petal = document.createElement('div');
+                petal.className = 'petal';
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.width = Math.random() * 15 + 10 + 'px';
+                petal.style.height = petal.style.width;
+                petal.style.animationDuration = Math.random() * 3 + 2 + 's';
+                petal.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(petal);
+            }
+
+            // Create Sparkles
+            for (let i = 0; i < 20; i++) {
+                let sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + 'vw';
+                sparkle.style.top = Math.random() * 100 + 'vh';
+                sparkle.style.width = Math.random() * 5 + 2 + 'px';
+                sparkle.style.height = sparkle.style.width;
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(sparkle);
             }
         }
     </script>
